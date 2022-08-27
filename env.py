@@ -1,20 +1,15 @@
-# Здесь нужно выбрать вариант отправки собранных из BACnet данных
-#GTW_MODE = "modbus-mqtt"  # или TODO
-
-# Параметры сетевого интерфейса хоста с которого опрашиваются девайсы
-#HOST_IP = "10.168.253.150"
-#HOST_PORT = 47808
-
 # Список csv-файлов с конфигурациями объектов девайсов, вписанные девайсы будут опрашиваться
-DEVICE_CSV = ['device_100.csv']
+DEVICE_LIST = ['device.csv']
 
-# Максимальное Количество точек для мультичтения
-#MILTIREAD = False #  Минимум 3, Максимум заисит от того сколько может отдать девайс по превысив APDU
+#  Ограничение на время чтения регистров в секундах
+READ_TIMEOUT = 30
+#  Чтение группами, если MULTI_READ=1, по одному, если MULTI_READ=0
+MULTI_READ = 0
 
 # MQTT параметры
-USER_NAME = 'admin'
-USE_PASSWD = 'admin'
-BROKER = "46.8.210.67"
+USER_NAME = 'user'
+USE_PASSWD = 'user'
+BROKER = "mq.demo.promuc.ru"
 BROKER_PORT = 15675
 TOPIC = "zavidovo"
 
