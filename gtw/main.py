@@ -1,11 +1,11 @@
 from loguru import logger
 from func_timeout import FunctionTimedOut
 import time
-from gtw.csv_to_dict import get_device_dict
-from modbus import TCPClient, Convertor
+from modbus import TCPClient
+from convertor import Convertor
 from mqtt import MyMQTT
 from gtw.env import *
-from gtw.grouper import Grouper
+from gtw.grouper import Grouper, get_device_dict
 
 
 class GTW:
@@ -23,6 +23,8 @@ class GTW:
                 logger.info("Grouping objects...")
                 self.gr = Grouper()
                 self.signals = self.gr.grouping()
+                for i in self.signals['name']:
+                    print(i,'\n')
                 self.client = TCPClient(self.device['device_ip'][0], self.device['port'][0])
                 if self.client.connection():
                     if MULTI_READ:
