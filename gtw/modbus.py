@@ -3,7 +3,7 @@ import struct
 from loguru import logger
 import math
 from func_timeout import func_set_timeout
-from env import READ_TIMEOUT
+from gtw.env import READ_TIMEOUT
 
 
 class TCPClient:
