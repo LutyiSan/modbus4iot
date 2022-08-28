@@ -1,19 +1,31 @@
-import pandas as pd
-from loguru import logger
+# from loguru import logger
 from operator import itemgetter
-from env import DEVICE_LIST
+from env import MULTI_READ
 
-PREFIX = "gtw/devices/"
+PREFIX = "devices/"
 
 
-def get_device_dict(file):
-    try:
-        device_dict = pd.read_csv(f"{PREFIX}{file}", delimiter=";", index_col=False).to_dict('list')
-        #  print(device_dict)
-        return device_dict
-    except Exception as e:
-        logger.exception(f"FAIL read csv{file}", e)
-        return False
+def csv_to_dict(csv_file, csv_delimiter):
+    with open(f"{PREFIX}{csv_file}", 'r') as fl:
+        csv_txt = fl.read().splitlines()
+    cols = csv_txt[0].split(csv_delimiter)
+    result_dict = dict.fromkeys(cols)
+    for col in cols:
+        result_dict[col] = []
+    idx = 0
+    rows = len(csv_txt) - 1
+    while idx < rows:
+        idx += 1
+        row = csv_txt[idx].split(csv_delimiter)
+        c = -1
+        for col in cols:
+            c += 1
+            if row[c] == '':
+                row[c] = 'None'
+            elif row[c].isdigit():
+                row[c] = int(row[c])
+            result_dict[col].append(row[c])
+    return result_dict
 
 
 def get_signal_list(device):
@@ -33,7 +45,8 @@ def get_signal_list(device):
 
 
 def get_sorted_signal_dict(signals_list):
-    signals = {"reg_type": [], 'reg_address': [], 'quantity': [], 'bit_number': [], 'value_type': [], 'scale': [], 'name': []}
+    signals = {"reg_type": [], 'reg_address': [], 'quantity': [], 'bit_number': [], 'value_type': [], 'scale': [],
+               'name': []}
     sl = sorted(signals_list, key=itemgetter(1, 2, 4))
     for i in sl:
         signals['reg_type'].append(i[1])
@@ -48,106 +61,49 @@ def get_sorted_signal_dict(signals_list):
 
 
 class Grouper:
-    def __init__(self):
+    def __init__(self, device):
         self.return_dict = {'start_address': [], 'read_quantity': [], 'reg_type': [], 'reg_address': [],
                             'quantity': [], 'value_type': [], 'bit_number': [], 'name': [], 'present_value': [],
                             'scale': []}
-        self.signals = get_sorted_signal_dict(get_signal_list(get_device_dict(DEVICE_LIST[0])))
-        print(self.signals['reg_address'])
-        self.len_signals = len(self.signals['reg_address']) - 1
-        self.reg_address = self.signals['reg_address']
-        self.query_quantity = self.signals['quantity']
-        self.reg_type = self.signals['reg_type']
-        self.value_type = self.signals['value_type']
-        self.bit_number = self.signals['bit_number']
-        self.id = self.signals['name']
-        self.return_dict['scale'] = self.signals['scale']
-        self.start_register = self.reg_address[0]
-        self.read_quantity = None
+        self.signals = get_sorted_signal_dict(get_signal_list(csv_to_dict(device, ';')))
+        self.signals['start_address'] = []
+        self.signals['read_quantity'] = []
+        self.signals['present_value'] = []
 
-    # print(self.reg_type)
-
-    def append_data(self, *args):
-        self.return_dict['reg_address'].append(args[0])
-        self.return_dict['quantity'].append(args[1])
-        self.return_dict['value_type'].append(args[2])
-        if args[3] is not None:
-            self.return_dict['bit_number'].append(args[3])
-        else:
-            self.return_dict['bit_number'].append('none')
-        self.return_dict['name'].append(args[4])
-        print(f"First append address: {args[0]}  quantity: {args[1]}  value_type: {args[2]}")
-
-    def append_second_data(self, *args):
-        self.return_dict['start_address'].append(args[0])
-        self.return_dict['read_quantity'].append(args[1])
-        self.return_dict['reg_type'].append(args[2])
-        print(f"Second append start_address: {args[0]}  read_quantity: {args[1]}  reg_type: {args[2]}")
     def grouping(self):
-        max_quanty = 124
-        self.read_quantity = self.query_quantity[0]
-        idx = -1
-        while idx < self.len_signals:
-            idx += 1
-            if idx != self.len_signals:
-                # Если адрес регистра + длина запроса равны по значению следующему адресу и тип регистра одинаковый
-                if (self.reg_address[idx] + self.query_quantity[idx] == self.reg_address[idx + 1]) and \
-                        (self.reg_type[idx] == self.reg_type[idx + 1]):
-                    print('if-1')
-                    self.read_quantity += self.query_quantity[idx + 1]
-                    self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                     self.value_type[idx], self.bit_number[idx], self.id[idx])
+        if MULTI_READ > 125:
+            max_query = 125
+        else:
+            max_query = MULTI_READ
+        self.len_signals = len(self.signals['reg_address']) - 2
+        self.start_address = self.signals['reg_address'][0]
+        self.read_quantity = 0
+        i = -1
+        while i < self.len_signals:
+            if self.read_quantity == max_query:
+                self.__append_group(self.start_address,self.read_quantity)
+                self.start_address = self.signals['reg_address'][i + 1]
+                self.read_quantity = 0
+            i += 1
+            if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:
 
-                # Если адрес регистра такой же как и у следующего и у них одинаковый тип регистра
-                elif (self.reg_address[idx] == self.reg_address[idx + 1]) and \
-                        (self.reg_type[idx] == self.reg_type[idx + 1]):
-                    print('elif-1')
-                    self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                     self.value_type[idx], self.bit_number[idx], self.id[idx])
-
-                # Если адрес регистра такой же как у предыдущего и не такой, как у следующего
-                elif (self.reg_address[idx] == self.reg_address[idx - 1]) and (
-                        self.reg_address[idx] != self.reg_address[idx + 1]):
-                    print('elif-2')
-                    self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                     self.value_type[idx], self.bit_number[idx], self.id[idx])
-                    self.append_second_data(self.start_register, self.read_quantity, self.reg_type[idx])
-                    self.start_register = self.reg_address[idx + 1]
-                    self.read_quantity = self.query_quantity[idx + 1]
-                # Любая иная ситуация
-                else:
-                    print('else-1')
-
-                    if (self.reg_address[idx] - self.query_quantity[idx - 1] == self.reg_address[idx - 1]) and \
-                            (self.reg_type[idx] == self.reg_type[idx - 1]):
-
-                        print('if-2')
-                        self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                         self.value_type[idx], self.bit_number[idx], self.id[idx])
-                        self.append_second_data(self.start_register, self.read_quantity, self.reg_type[idx])
-                        self.start_register = self.reg_address[idx + 1]
-                        self.read_quantity = self.query_quantity[idx + 1]
-                    else:
-                        print('else-2')
-                        self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                         self.value_type[idx], self.bit_number[idx], self.id[idx])
-                        self.append_second_data(self.start_register, self.query_quantity[idx], self.reg_type[idx])
-                        self.start_register = self.reg_address[idx + 1]
-                        self.read_quantity = self.query_quantity[idx + 1]
+                self.__type_grouper(i)
             else:
-                print('else-3')
-                if self.reg_address[idx] - self.query_quantity[idx - 1] == self.reg_address[idx - 1] and \
-                        self.reg_type[idx] == self.reg_type[idx - 1]:
-                    print('if-3')
-                   # self.append_second_data(self.start_register, self.read_quantity, self.reg_type[idx])
-                    self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                     self.value_type[idx], self.bit_number[idx], self.id[idx])
-                else:
-                    print('else-4')
-                    self.append_data(self.reg_address[idx], self.query_quantity[idx],
-                                     self.value_type[idx], self.bit_number[idx], self.id[idx])
-                    self.read_quantity = self.query_quantity[idx]
+                self.__append_group(self.start_address, self.read_quantity)
+                self.__type_grouper(i)
+        self.__append_group(self.start_address, self.read_quantity + self.signals['quantity'][i])
+        return self.signals
 
-        self.append_second_data(self.start_register, self.read_quantity, self.reg_type[idx])
-        return self.return_dict
+    def __append_group(self, *args):
+        self.signals['start_address'].append(args[0])
+        self.signals['read_quantity'].append(args[1])
 
+    def __type_grouper(self,i):
+        if self.signals['reg_address'][i] + self.signals['quantity'][i] == self.signals['reg_address'][i + 1]:
+            self.read_quantity += self.signals['quantity'][i + 1]
+        elif (self.signals['reg_address'][i] + self.signals['quantity'][i] != self.signals['reg_address'][
+            i + 1]) \
+                and self.signals['reg_address'][i] != self.signals['reg_address'][i + 1]:
+            self.__append_group(self.start_address, self.read_quantity)
+            self.start_address = self.signals['reg_address'][i + 1]
+            self.read_quantity = self.signals['quantity'][i + 1]

@@ -4,6 +4,8 @@ from func_timeout import func_set_timeout
 from gtw.env import READ_TIMEOUT
 
 FAULT_VALUE = 'fault'
+
+
 class TCPClient:
     def __init__(self, ip_address, tcp_port):
         self.client = modbusClient.ModbusClient(ip_address, tcp_port)
