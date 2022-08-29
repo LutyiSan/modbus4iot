@@ -26,6 +26,7 @@ class MyMQTT:
             return False
 
     def send(self, topic, send_data):
+       # print(send_data)
         try:
             send_json = json.dumps(send_data)
             self.client.publish(topic, payload=send_json, qos=0, retain=False)
