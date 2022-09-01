@@ -86,9 +86,12 @@ class Grouper:
             self.read_quantity = 0
             i = -1
             while i < self.len_signals:
+
                 if self.read_quantity == max_query:
+
                     self.__append_group(self.start_address, self.read_quantity)
-                    self.start_address = self.signals['reg_address'][i + 1]
+                    self.start_address = self.signals['reg_address'][i + 2]
+
                     self.read_quantity = 0
                 i += 1
                 if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:

@@ -39,14 +39,6 @@ class GTW:
     def __group_objects(self, device):
         self.grouper = Grouper(device)
         self.signals = self.grouper.grouping()
-        q=0
-        for qq in self.signals['quantity']:
-            q+=qq
-        rq = 0
-        for rqq in self.signals['quantity']:
-            rq += rqq
-        print(f" Len quanty {q}  lem read_quanty {rq}")
-
         return self.signals
 
     def __modbus_connect(self, ip, port):
