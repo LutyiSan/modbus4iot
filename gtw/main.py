@@ -58,6 +58,7 @@ class GTW:
             try:
                 logger.info(f"Reading objects from device...{ip}")
                 self.reading_data = self.client.read_multiple(signals)
+                print(len(self.reading_data[1]))
             except FunctionTimedOut:
                 logger.exception("TIMEOUT", FunctionTimedOut)
             self.client.disconnect()

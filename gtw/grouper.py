@@ -96,9 +96,7 @@ class Grouper:
                 else:
                     self.__append_group(self.start_address, self.read_quantity)
                     self.__type_grouper(i)
-            self.__append_group(self.start_address, self.read_quantity + self.signals['quantity'][i])
-         #   print(sum(self.signals['read_quantity']))
-        #  print(sum(self.signals['quantity']))
+            self.__append_group(self.start_address, self.read_quantity)
 
             return self.signals
         else:
