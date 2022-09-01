@@ -1,4 +1,4 @@
-# modbus4iot
+# modbus4iot v.2.1
 Данная программа является шлюзом ModbusTCP - MQTT.
 # Установка
 1. Выполнить команду "sudo git lone https://github.com/LutyiSan/modbus4iot"
