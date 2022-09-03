@@ -9,13 +9,13 @@ device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;to
 10.21.105.160;502;hr;40008;1;;bool;1;breg_29;testDevice
 10.21.105.160;502;hr;40009;1;;bool;1;breg_30;testDevice
 10.21.105.160;502;hr;40010;1;;bool;1;breg_31;testDevice
-10.21.105.160;502;hr;40011;1;;bool;1;breg_41;testDevice
+10.21.105.160;502;ir;40011;1;;bool;1;breg_41;testDevice
 10.21.105.160;502;hr;40012;1;;bool;1;breg_43;testDevice
 10.21.105.160;502;hr;40013;1;;bool;1;breg_45;testDevice
 10.21.105.160;502;hr;40014;1;;bool;1;breg_55;testDevice
-10.21.105.160;502;hr;40015;1;;bool;1;breg_66;testDevice
+10.21.105.160;502;ir;40015;1;;bool;1;breg_66;testDevice
 10.21.105.160;502;hr;40016;1;;bool;1;breg_67;testDevice
-10.21.105.160;502;hr;40017;1;;bool;1;breg_68;testDevice
+10.21.105.160;502;ir;40017;1;;bool;1;breg_68;testDevice
 10.21.105.160;502;hr;40018;1;;bool;1;breg_69;testDevice
 10.21.105.160;502;hr;40019;1;;bool;1;breg_70;testDevice
 10.21.105.160;502;hr;40020;1;;bool;1;breg_71;testDevice

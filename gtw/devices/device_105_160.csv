@@ -127,7 +127,7 @@ device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;to
 10.21.105.160;502;hr;6;2;;float;0.1;freg_6;testDevice
 10.21.105.160;502;hr;9;2;;float;1;freg_9;testDevice
 10.21.105.160;502;hr;13;2;;float;1;freg_13;testDevice
-10.21.105.160;502;hr;17;2;;float;1;freg_17;testDevice   [1, 9, 17, 26, 41, 49, 57, 66, 81, 89, 97, 106, 119, 121, 131, 141, 151, 154] [6, 7, 6, 6, 7, 7, 6, 6, 7, 7, 6, 6, 1, 9, 9, 9, 2, 5]
+10.21.105.160;502;hr;17;2;;float;1;freg_17;testDevice
 10.21.105.160;502;hr;19;2;;float;1;freg_19;testDevice
 10.21.105.160;502;hr;21;2;;float;1;freg_21;testDevice
 10.21.105.160;502;hr;46;2;;float;1;freg_46;testDevice

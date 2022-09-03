@@ -29,6 +29,7 @@ class MyMQTT:
         try:
             send_json = json.dumps(send_data)
             self.client.publish(topic, payload=send_json, qos=0, retain=False)
+            logger.debug(f"Sending data {send_json}....")
             logger.debug(f"SUCCESSFUL sent data {topic}")
         except Exception as e:
             logger.exception("FAIL sent data to mqtt\n", e)

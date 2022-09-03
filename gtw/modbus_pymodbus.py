@@ -62,22 +62,26 @@ class TCPClient:
                 pv = TCPClient.read_verifier(
                     self.__read_hr(signals['start_address'][idx], signals['read_quantity'][idx]),
                     signals['read_quantity'][idx])
+                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
                 pv_list.append(pv)
             elif signals['reg_type'][idx] == "ir":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_ir(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
+                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
             elif signals['reg_type'][idx] == "coil":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_coils(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
+                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
             elif signals['reg_type'][idx] == "di":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_di(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
+                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
         logger.info(".....STOP reading")
         for group in pv_list:
             for value in group:
@@ -130,10 +134,10 @@ class TCPClient:
     def read_verifier(values, quantity):
         return_values = []
         if isinstance(values, list) and (len(values) == quantity):
-            logger.info(values)
+           # logger.info(values)
             return values
         else:
             for i in range(quantity):
                 return_values.append('fault')
-            logger.info(return_values)
+           # logger.info(return_values)
             return return_values
