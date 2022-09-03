@@ -76,9 +76,9 @@ class GTW:
 
 def runtime():
     gtw = GTW()
-    #while True:
-    gtw.run_gtw()
-    time.sleep(1)
+    while True:
+        gtw.run_gtw()
+        time.sleep(1)
 
 
 if __name__ == "__main__":
