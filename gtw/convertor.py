@@ -23,8 +23,8 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-            if self.bit_number[self.i] == 'None' or (
-                    self.bit_number[self.i] != 'None' and self.value_type[self.i] != 'bool'):
+
+            if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
                 elif self.value_type[self.i] == 'int32':
@@ -33,29 +33,31 @@ class Convertor:
                     self._value_uint16()
                 elif self.value_type[self.i] == 'uint32':
                     self._value_uint32()
-                elif self.value_type[self.i] == 'bool':
-                    self._value_bool()
                 elif self.value_type[self.i] == 'float':
                     self._value_float()
+            elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] == 'None':
+                print('booooool')
+                self._value_bool()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] != 'None':
                 self._value_bit()
+            print(self.signals['present_value'])
         logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
         return self.signals
 
     def _value_int16(self):
         self.add_quantity = 1
-        if isinstance(self.data_values[self.index_data_value:self.index_data_value + 1][0], str):
+        if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = Convertor.to_int16(self.data_values[self.index_data_value:self.index_data_value + 1][0])
+            pv = Convertor.to_int16(self.data_values[self.index_data_value])
             self.present_value.append(pv * float(self.scale[self.i]))
         self.i += self.add_quantity
         self.index_data_value += self.add_quantity
 
     def _value_int32(self):
         self.add_quantity = 2
-        big = self.data_values[self.index_data_value:self.index_data_value + 1][0]
-        little = self.data_values[self.index_data_value + 1:self.index_data_value + 2][0]
+        big = self.data_values[self.index_data_value]
+        little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
             self.present_value.append(self.fault_value)
         else:
@@ -66,19 +68,18 @@ class Convertor:
 
     def _value_uint16(self):
         self.add_quantity = 1
-        if isinstance(self.data_values[self.index_data_value:self.index_data_value + 1][0], str):
+        if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = self.data_values[self.index_data_value:self.index_data_value + 1][0]
+            pv = self.data_values[self.index_data_value]
             self.present_value.append(pv * float(self.scale[self.i]))
         self.index_data_value += self.add_quantity
         self.i += 1
 
     def _value_uint32(self):
         self.add_quantity = 2
-        print(self.signals['name'][self.i])
-        big = self.data_values[self.index_data_value:self.index_data_value + 1][0]
-        little = self.data_values[self.index_data_value + 1:self.index_data_value + 2][0]
+        big = self.data_values[self.index_data_value]
+        little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
             self.present_value.append(self.fault_value)
         else:
@@ -89,8 +90,8 @@ class Convertor:
 
     def _value_float(self):
         self.add_quantity = 2
-        big = self.data_values[self.index_data_value:self.index_data_value + 1][0]
-        little = self.data_values[self.index_data_value + 1:self.index_data_value + 2][0]
+        big = self.data_values[self.index_data_value]
+        little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
             self.present_value.append(self.fault_value)
         else:
@@ -101,10 +102,10 @@ class Convertor:
 
     def _value_bool(self):
         self.add_quantity = 1
-        if isinstance(self.data_values[self.index_data_value:self.index_data_value + 1][0], str):
+        if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = Convertor.to_bool(self.data_values[self.index_data_value:self.index_data_value + 1][0],
+            pv = Convertor.to_bool(self.data_values[self.index_data_value],
                                    self.bit_number[self.i])
             self.present_value.append(pv)
         self.index_data_value += self.add_quantity
@@ -113,16 +114,16 @@ class Convertor:
     def _value_bit(self):
         self.add_quantity = 1
         if self.reg_address[self.i] != self.reg_address[self.i + 1]:
-            pv = Convertor.to_bool(self.data_values[self.index_data_value:self.index_data_value + 1][0],
+            pv = Convertor.to_bool(self.data_values[self.index_data_value],
                                    self.bit_number[self.i])
             self.present_value.append(pv)
             self.i += 1
         while self.reg_address[self.i] == self.reg_address[self.i + 1] or self.reg_address[self.i] == \
                 self.reg_address[self.i - 1]:
-            if self.data_values[self.index_data_value:self.index_data_value + 1][0] == self.fault_value:
+            if self.data_values[self.index_data_value] == self.fault_value:
                 self.present_value.append(self.fault_value)
             else:
-                pv = Convertor.to_bool(self.data_values[self.index_data_value:self.index_data_value + 1][0],
+                pv = Convertor.to_bool(self.data_values[self.index_data_value],
                                        self.bit_number[self.i])
                 self.present_value.append(pv)
             self.i += 1

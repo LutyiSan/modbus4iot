@@ -1,5 +1,5 @@
 # Список csv-файлов с конфигурациями объектов девайсов, вписанные девайсы будут опрашиваться
-DEVICE_LIST = ['device_105_160.csv','device_105_158.csv','device_mod_sim.csv']
+DEVICE_LIST = ['device_mod_sim.csv','device_105_158.csv']
 
 #  Чтение группами, если MULTI_READ > 1, по одному, если MULTI_READ=1
 MULTI_READ = 20  # Так же задает максимальную длину запроса (default=20)

@@ -12,7 +12,7 @@ class Validator:
         self.check_quantity(check_data['quantity'])
         self.check_bit(check_data['bit_number'])
         self.check_value_type(check_data['value_type'])
-        self.check_scale(check_data['scale'])
+    #    self.check_scale(check_data['scale'])
         self.check_name(check_data['name'])
         self.check_topic(check_data['topic'][0])
         if False in self.state:

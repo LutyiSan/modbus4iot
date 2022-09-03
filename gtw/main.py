@@ -27,13 +27,14 @@ class GTW:
                             logger.info("Convert reading objects...")
                             cv = Convertor(self.reading_data[0], self.reading_data[1])
                             self.result = cv.convert()
+                            self.__sent_data()
                         else:
                             logger.error(f"Some trouble with read registers from device {self.device['device_ip'][0]}")
                 else:
                     logger.error(f"{device} with device-data is wrong")
             else:
                 logger.error(f"{device} with device-data is wrong")
-            self.__sent_data()
+
 
     def __group_objects(self, device):
         self.grouper = Grouper(device)
@@ -75,9 +76,9 @@ class GTW:
 
 def runtime():
     gtw = GTW()
-    while True:
-        gtw.run_gtw()
-        time.sleep(0.1)
+    #while True:
+    gtw.run_gtw()
+    time.sleep(1)
 
 
 if __name__ == "__main__":

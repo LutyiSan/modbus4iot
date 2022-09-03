@@ -81,6 +81,7 @@ class TCPClient:
         for group in pv_list:
             for value in group:
                 data_list.append(value)
+        print(data_list)
         return signals, data_list
 
     def __read_hr(self, reg_number, quantity):
