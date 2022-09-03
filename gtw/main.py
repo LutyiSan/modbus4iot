@@ -35,7 +35,6 @@ class GTW:
             else:
                 logger.error(f"{device} with device-data is wrong")
 
-
     def __group_objects(self, device):
         self.grouper = Grouper(device)
         self.signals = self.grouper.grouping()

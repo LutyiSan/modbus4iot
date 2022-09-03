@@ -36,11 +36,11 @@ class Convertor:
                 elif self.value_type[self.i] == 'float':
                     self._value_float()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] == 'None':
-                print('booooool')
+
                 self._value_bool()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] != 'None':
                 self._value_bit()
-            print(self.signals['present_value'])
+
         logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
         return self.signals
 
