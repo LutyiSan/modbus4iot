@@ -1,6 +1,6 @@
 device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;topic
 10.21.105.159;502;hr;23296;2;;uint32;0.1;3_PHASE_SYSTEM_VOLTAGE;device105158
-10.21.105.158;502;hr;23298;2;;uint32;0.1;PHASE_VOLTAGE_L1_N;device105158
+10.21.105.159;502;hr;23298;2;;uint32;0.1;PHASE_VOLTAGE_L1_N;device105158
 10.21.105.158;502;hr;23300;2;;uint32;0.1;PHASE_VOLTAGE_L2_N;device-105-158
 10.21.105.158;502;hr;23302;2;;uint32;0.1;PHASE_VOLTAGE_L3_N;device-105-158
 10.21.105.158;502;hr;23304;2;;uint32;0.1;LINE_VOLTAGE_L1_2;device-105-158

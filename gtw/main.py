@@ -25,6 +25,7 @@ class GTW:
                     if self.__modbus_connect(self.device['device_ip'][0], self.device['port'][0]):
                         if self.__modbus_read(self.device['device_ip'][0], self.signals, self.device):
                             logger.info("Convert reading objects...")
+                            print(self.reading_data[0], self.reading_data[1])
                             cv = Convertor(self.reading_data[0], self.reading_data[1])
                             self.result = cv.convert()
                             self.__sent_data()
@@ -52,6 +53,7 @@ class GTW:
             except Exception as e:
                 logger.exception("TIMEOUT", e)
             self.client.disconnect()
+          #  print(len(self.reading_data[1]))
             return self.reading_data
         else:
             try:
@@ -64,11 +66,15 @@ class GTW:
 
     def __sent_data(self):
         if self.result:
+           # print(len(self.result['present_value']))
             sent_data = dict.fromkeys(self.result['name'])
             idx = -1
-            for i in sent_data:
+            while idx < (len(self.result['name'])-1):
                 idx += 1
-                sent_data[i] = self.result['present_value'][idx]
+                logger.info(idx)
+                logger.info(self.result['present_value'][idx])
+
+                sent_data[self.result['name'][idx]] = self.result['present_value'][idx]
             if self.mqttclient.connect(BROKER, BROKER_PORT):
                 self.mqttclient.send(f'{TOPIC}/{self.device["topic"][1]}', sent_data)
 

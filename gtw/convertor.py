@@ -19,11 +19,13 @@ class Convertor:
         self.fault_value = 'fault'
 
     def convert(self):
-        count = len(self.name)-1
+        count = len(self.name)
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-
+            logger.debug(
+                f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
+          #  print(self.signals['value_type'][self.i])
             if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
@@ -42,6 +44,7 @@ class Convertor:
                 self._value_bit()
 
         logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
+       # print(self.signals)
         return self.signals
 
     def _value_int16(self):

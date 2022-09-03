@@ -48,6 +48,7 @@ class TCPClient:
         for group in pv_list:
             for value in group:
                 data_list.append(value)
+
         return device, data_list
 
     def read_multiple(self, signals):

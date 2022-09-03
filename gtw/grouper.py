@@ -80,23 +80,27 @@ class Grouper:
                 max_query = 125
             else:
                 max_query = MULTI_READ
-            self.len_signals = len(self.signals['reg_address']) - 2
+            self.len_signals = len(self.signals['reg_address'])
+            print(self.signals['reg_address'])
+            print(self.signals['quantity'])
             self.start_address = self.signals['reg_address'][0]
-            self.read_quantity = 0
+            self.read_quantity = self.signals['quantity'][0]
             i = -1
-            while i < self.len_signals:
+            while i < self.len_signals-2:
+
                 if self.read_quantity == max_query:
                     self.__append_group(self.start_address, self.read_quantity)
                     self.start_address = self.signals['reg_address'][i + 1]
                     self.read_quantity = 0
                 i += 1
+
                 if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:
                     self.__type_grouper(i)
                 else:
                     self.__append_group(self.start_address, self.read_quantity)
                     self.__type_grouper(i)
             self.__append_group(self.start_address, self.read_quantity)
-          #  print(self.signals['start_address'], self.signals['read_quantity'])
+            print(self.signals['start_address'], self.signals['read_quantity'])
             return self.signals
         else:
             return False
