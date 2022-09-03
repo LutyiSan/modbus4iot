@@ -1,0 +1,4 @@
+loguru~=0.6.0
+paho-mqtt~=1.6.1
+pymodbus~=2.5.3
+EasyModbus~=1.4.0

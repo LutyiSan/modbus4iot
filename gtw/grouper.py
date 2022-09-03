@@ -1,6 +1,6 @@
 from operator import itemgetter
 from env import MULTI_READ
-from csv_validator import check_csv_data
+from csv_validator import Validator
 
 PREFIX = "devices/"
 
@@ -25,41 +25,40 @@ def csv_to_dict(csv_file, csv_delimiter):
             elif row[c].isdigit():
                 row[c] = int(row[c])
             result_dict[col].append(row[c])
-    if check_csv_data(result_dict):
+    validator = Validator()
+    if validator.check_csv_data(result_dict):
         return result_dict
     else:
         return False
 
 
 def get_signal_list(device):
-    ldt = []
+    param_list = []
     count = len(device['reg_address']) - 1
     idx = -1
     while idx < count:
         idx += 1
-
-        dt = (
+        param = (
             device['name'][idx], device['reg_type'][idx], device['reg_address'][idx], device['quantity'][idx],
             device['bit_number'][idx],
             device['value_type'][idx], device['scale'][idx])
-        ldt.append(dt)
+        param_list.append(param)
     # print(ldt)
-    return ldt
+    return param_list
 
 
 def get_sorted_signal_dict(signals_list):
     signals = {"reg_type": [], 'reg_address': [], 'quantity': [], 'bit_number': [], 'value_type': [], 'scale': [],
                'name': []}
-    sl = sorted(signals_list, key=itemgetter(1, 2, 4))
-    for i in sl:
-        signals['reg_type'].append(i[1])
-        signals['reg_address'].append(i[2])
-        signals['quantity'].append(i[3])
-        signals['bit_number'].append(i[4])
-        signals['value_type'].append(i[5])
-        signals['scale'].append(i[6])
-        signals['name'].append(i[0])
-    # print(signals)
+    sorted_list = sorted(signals_list, key=itemgetter(1, 2, 4))
+    for value in sorted_list:
+        signals['name'].append(value[0])
+        signals['reg_type'].append(value[1])
+        signals['reg_address'].append(value[2])
+        signals['quantity'].append(value[3])
+        signals['bit_number'].append(value[4])
+        signals['value_type'].append(value[5])
+        signals['scale'].append(value[6])
     return signals
 
 
@@ -86,12 +85,9 @@ class Grouper:
             self.read_quantity = 0
             i = -1
             while i < self.len_signals:
-
                 if self.read_quantity == max_query:
-
                     self.__append_group(self.start_address, self.read_quantity)
-                    self.start_address = self.signals['reg_address'][i + 2]
-
+                    self.start_address = self.signals['reg_address'][i + 1]
                     self.read_quantity = 0
                 i += 1
                 if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:
@@ -120,4 +116,3 @@ class Grouper:
             self.__append_group(self.start_address, self.read_quantity)
             self.start_address = self.signals['reg_address'][i + 1]
             self.read_quantity = self.signals['quantity'][i + 1]
-

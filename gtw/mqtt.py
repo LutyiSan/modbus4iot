@@ -1,4 +1,4 @@
-import paho.mqtt.client as mqttc
+import paho.mqtt.client as mqclient
 import json
 from loguru import logger
 
@@ -7,7 +7,7 @@ class MyMQTT:
 
     def create(self, user_name, user_passwd):
         try:
-            self.client = mqttc.Client(userdata=None, protocol=mqttc.MQTTv311, transport="websockets")
+            self.client = mqclient.Client(userdata=None, protocol=mqclient.MQTTv311, transport="websockets")
             self.client.ws_set_options(path="/ws", headers=None)
             self.client.username_pw_set(username=user_name, password=user_passwd)
             logger.debug("READY create mqtt-client")
@@ -26,7 +26,6 @@ class MyMQTT:
             return False
 
     def send(self, topic, send_data):
-       # print(send_data)
         try:
             send_json = json.dumps(send_data)
             self.client.publish(topic, payload=send_json, qos=0, retain=False)
