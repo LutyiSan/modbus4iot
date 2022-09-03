@@ -1,4 +1,4 @@
-from loguru import logger
+# from loguru import logger
 import struct
 
 
@@ -23,9 +23,9 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-          #  logger.debug(
-             #   f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
-          #  print(self.signals['value_type'][self.i])
+            #  logger.debug(
+            #   f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
+            #  print(self.signals['value_type'][self.i])
             if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
@@ -43,8 +43,8 @@ class Convertor:
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] != 'None':
                 self._value_bit()
 
-        #logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
-       # print(self.signals)
+        # logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals[
+        # 'present_value'])}") print(self.signals)
         return self.signals
 
     def _value_int16(self):
