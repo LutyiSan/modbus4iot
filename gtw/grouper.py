@@ -81,8 +81,8 @@ class Grouper:
             else:
                 max_query = MULTI_READ
             self.len_signals = len(self.signals['reg_address'])
-            print(self.signals['reg_address'])
-            print(self.signals['quantity'])
+          #  print(self.signals['reg_address'])
+          #  print(self.signals['quantity'])
             self.start_address = self.signals['reg_address'][0]
             self.read_quantity = self.signals['quantity'][0]
             i = -1
@@ -100,7 +100,7 @@ class Grouper:
                     self.__append_group(self.start_address, self.read_quantity)
                     self.__type_grouper(i)
             self.__append_group(self.start_address, self.read_quantity)
-            print(self.signals['start_address'], self.signals['read_quantity'])
+          #  print(self.signals['start_address'], self.signals['read_quantity'])
             return self.signals
         else:
             return False

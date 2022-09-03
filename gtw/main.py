@@ -25,7 +25,7 @@ class GTW:
                     if self.__modbus_connect(self.device['device_ip'][0], self.device['port'][0]):
                         if self.__modbus_read(self.device['device_ip'][0], self.signals, self.device):
                             logger.info("Convert reading objects...")
-                            print(self.reading_data[0], self.reading_data[1])
+                       #     print(self.reading_data[0], self.reading_data[1])
                             cv = Convertor(self.reading_data[0], self.reading_data[1])
                             self.result = cv.convert()
                             self.__sent_data()
@@ -71,8 +71,8 @@ class GTW:
             idx = -1
             while idx < (len(self.result['name'])-1):
                 idx += 1
-                logger.info(idx)
-                logger.info(self.result['present_value'][idx])
+             #   logger.info(idx)
+             #   logger.info(self.result['present_value'][idx])
 
                 sent_data[self.result['name'][idx]] = self.result['present_value'][idx]
             if self.mqttclient.connect(BROKER, BROKER_PORT):
