@@ -1,5 +1,5 @@
 device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;topic
-10.21.105.160;502;hr;1;1;;bool;1;breg_1;testDevice
+127.0.0.1;502;hr;1;1;;bool;1;breg_1;testDevice
 10.21.105.160;502;hr;3;1;;bool;1;breg_3;testDevice
 10.21.105.160;502;hr;5;1;;bool;1;beg_5;testDevice
 10.21.105.160;502;hr;15;1;;bool;1;breg_15;testDevice
@@ -11,7 +11,7 @@ device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;to
 10.21.105.160;502;hr;31;1;;bool;1;breg_31;testDevice
 10.21.105.160;502;hr;41;1;;bool;1;breg_41;testDevice
 10.21.105.160;502;hr;43;1;;bool;1;breg_43;testDevice
-10.21.105.160;502;hr;45;1;;bool;1;breg_45;testDevice
+10.21.105.160;502;ir;45;1;;bool;1;breg_45;testDevice
 10.21.105.160;502;hr;55;1;;bool;1;breg_55;testDevice
 10.21.105.160;502;hr;66;1;;bool;1;breg_66;testDevice
 10.21.105.160;502;hr;67;1;;bool;1;breg_67;testDevice
@@ -146,7 +146,7 @@ device_ip;port;reg_type;reg_address;quantity;bit_number;value_type;scale;name;to
 10.21.105.160;502;hr;4;1;;int16;1;ireg_4;testDevice
 10.21.105.160;502;hr;11;1;;int16;1;ireg_11;testDevice
 10.21.105.160;502;hr;12;1;;int16;1;ireg_12;testDevice
-10.21.105.160;502;ir;42;1;;int16;1;ireg_42;testDevice
+10.21.105.160;502;hr;42;1;;int16;1;ireg_42;testDevice
 10.21.105.160;502;ir;44;1;;int16;1;ireg_44;testDevice
 10.21.105.160;502;hr;51;1;;int16;1;ireg_51;testDevice
 10.21.105.160;502;hr;52;1;;int16;1;ireg_52;testDevice

@@ -19,7 +19,7 @@ class Convertor:
         self.fault_value = 'fault'
 
     def convert(self):
-        count = len(self.name)
+        count = len(self.name)-1
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
