@@ -5,18 +5,19 @@ from loguru import logger
 class TCPClient:
     UNIT = 0x1
     FAULT_VALUE = 'fault'
+    mblog = logger
 
     def connection(self, ip_address, tcp_port=502, timeout=3):
         try:
             self.client = ModbusClient(ip_address, port=tcp_port, timeout=timeout)
             if self.client.connect():
-                logger.debug(f"READY connection {ip_address}")
+                self.mblog.debug(f"READY connection {ip_address}")
                 return True
             else:
-                logger.error(f"FAIL connection {ip_address}")
+                self.mblog.error(f"FAIL connection {ip_address}")
                 return False
         except Exception as e:
-            logger.exception(f"FAIL connect {ip_address}", e)
+            self.mblog.exception(f"FAIL connect {ip_address}", e)
             return False
 
     def read_single(self, device):
@@ -43,7 +44,7 @@ class TCPClient:
                 pv = TCPClient.read_verifier(self.__read_di(device['reg_address'][idx], device['quantity'][idx]),
                                              device['quantity'][idx])
                 pv_list.append(pv)
-        logger.info(".....STOP reading")
+        self.mblog.info(".....STOP reading")
         data_list = []
         for group in pv_list:
             for value in group:
@@ -62,26 +63,26 @@ class TCPClient:
                 pv = TCPClient.read_verifier(
                     self.__read_hr(signals['start_address'][idx], signals['read_quantity'][idx]),
                     signals['read_quantity'][idx])
-                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
                 pv_list.append(pv)
             elif signals['reg_type'][idx] == "ir":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_ir(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
-                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
             elif signals['reg_type'][idx] == "coil":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_coils(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
-                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
             elif signals['reg_type'][idx] == "di":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_di(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
-                logger.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
         logger.info(".....STOP reading")
         for group in pv_list:
             for value in group:
@@ -96,7 +97,7 @@ class TCPClient:
 
             return result.registers
         except Exception as e:
-            logger.exception("Can't Read registers\n", e)
+            self.mblog.exception("Can't Read registers\n", e)
             return False
 
     def __read_ir(self, reg_number, quantity):
@@ -104,7 +105,7 @@ class TCPClient:
             result = self.client.read_input_registers(reg_number, quantity, unit=self.UNIT)
             return result.registers
         except Exception as e:
-            logger.exception("Can't Read registers\n", e)
+            self.mblog.exception("Can't Read registers\n", e)
             return False
 
     def __read_coils(self, reg_number, quantity):
@@ -112,7 +113,7 @@ class TCPClient:
             result = self.client.read_coils(reg_number, quantity, unit=self.UNIT)
             return result.bits
         except Exception as e:
-            logger.exception("Can't Read registers\n", e)
+            self.mblog.exception("Can't Read registers\n", e)
             return False
 
     def __read_di(self, reg_number, quantity):
@@ -120,7 +121,7 @@ class TCPClient:
             result = self.client.read_discrete_inputs(reg_number, quantity, unit=self.UNIT)
             return result.bits
         except Exception as e:
-            logger.exception("Can't Read registers\n", e)
+            self.mblog.exception("Can't Read registers\n", e)
             return False
 
     def disconnect(self):

@@ -2,7 +2,7 @@
 DEVICE_LIST = ['device_105_160.csv','device_mod_sim.csv']
 
 #  Чтение группами, если MULTI_READ > 1, по одному, если MULTI_READ=1
-MULTI_READ = 20# Так же задает максимальную длину запроса (default=20)
+MULTI_READ = 50 # Так же задает максимальную длину запроса (default=20)
 
 # MQTT параметры
 USER_NAME = 'user'
