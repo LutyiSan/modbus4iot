@@ -29,7 +29,7 @@ class TCPClient:
         query_count = len(device['name']) - 1
         idx = -1
         while idx < query_count:
-            logger.debug(device['reg_address'][idx])
+            pv = None
             idx += 1
             if device['reg_type'][idx] == "hr":
                 pv = TCPClient.read_verifier(self.__read_hr(device['reg_address'][idx], device['quantity'][idx]),
@@ -52,7 +52,7 @@ class TCPClient:
                         pv_list.append([True])
                 else:
                     pv_list.append(None)
-            logger.debug(pv)
+            logger.debug(f"registerss: {device['reg_address'][idx]} values: {pv}")
         self.mblog.info(".....STOP reading")
         data_list = []
         for group in pv_list:
@@ -124,19 +124,25 @@ class TCPClient:
             return False
 
     def __read_coils(self, reg_number, quantity):
+        out = []
         try:
             result = self.client.read_coils(reg_number, quantity, unit=self.UNIT)
-            return result.bits
+            for i in range(0, quantity):
+                out.append(result.bits[i])
+
+            return out
         except Exception as e:
             self.mblog.exception("Can't Read registers\n", e)
             return False
 
     def __read_di(self, reg_number, quantity):
-
+        out = []
         try:
             result = self.client.read_discrete_inputs(reg_number, quantity, unit=self.UNIT)
-            logger.debug(result.bits[0])
-            return result.bits
+            for i in range(0, quantity):
+                out.append(result.bits[i])
+
+            return out
         except Exception as e:
             self.mblog.exception("Can't Read registers\n", e)
             return False

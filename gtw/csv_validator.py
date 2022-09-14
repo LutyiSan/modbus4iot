@@ -60,10 +60,10 @@ class Validator:
 
     def check_bit(self, check_data):
         for bit in check_data:
-            if bit == None:
+            if bit is None:
                 self.state.append(True)
             else:
-                if Validator.validate_in_enum([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], bit):
+                if Validator.validate_digit(bit, 0, 15):
                     self.state.append(True)
                 else:
                     logger.error("column 'bit_number' must be a digit 0-15")
@@ -134,4 +134,3 @@ class Validator:
             return True
         else:
             return False
-

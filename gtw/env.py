@@ -2,7 +2,7 @@
 DEVICE_LIST = ['kgk_pilot.csv', 'kgk_pilot2.csv']
 
 #  Чтение группами, если MULTI_READ > 1, по одному, если MULTI_READ=1
-MULTI_READ = 1 # Так же задает максимальную длину запроса (default=20)
+MULTI_READ = 20  # Так же задает максимальную длину запроса (default=20)
 
 # MQTT параметры
 USER_NAME = 'user'

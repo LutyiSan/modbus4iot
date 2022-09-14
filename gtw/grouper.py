@@ -6,7 +6,6 @@ PREFIX = "devices/"
 
 
 def csv_to_dict(csv_file, csv_delimiter):
-    print(csv_file)
     with open(f"{PREFIX}{csv_file}", 'r') as fl:
         csv_txt = fl.read().splitlines()
     cols = csv_txt[0].split(csv_delimiter)
@@ -94,10 +93,10 @@ class Grouper:
                 if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:
                     self.__type_grouper(i)
                 else:
-                   # self.__append_group(self.start_address, self.read_quantity)
+                    # self.__append_group(self.start_address, self.read_quantity)
                     self.__type_grouper(i)
             self.__append_group(self.start_address, self.read_quantity)
-            print(self.signals)
+
             return self.signals
         else:
             return False

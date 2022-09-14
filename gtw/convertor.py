@@ -24,7 +24,7 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-            print('bit-number', self.bit_number[self.i])
+
             if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
@@ -47,17 +47,15 @@ class Convertor:
         return self.signals
 
     def _value_int16(self):
-        self.add_quantity = 1
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
             pv = Convertor.to_int16(self.data_values[self.index_data_value])
             self.present_value.append(pv * float(self.scale[self.i]))
-        self.i += self.add_quantity
-        self.index_data_value += self.add_quantity
+        self.i += 1
+        self.index_data_value += 1
 
     def _value_int32(self):
-        self.add_quantity = 2
         big = self.data_values[self.index_data_value]
         little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
@@ -65,21 +63,19 @@ class Convertor:
         else:
             pv = Convertor.to_int32([big, little])
             self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 2
         self.i += 1
 
     def _value_uint16(self):
-        self.add_quantity = 1
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
             pv = self.data_values[self.index_data_value]
             self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 1
         self.i += 1
 
     def _value_uint32(self):
-        self.add_quantity = 2
         big = self.data_values[self.index_data_value]
         little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
@@ -87,11 +83,10 @@ class Convertor:
         else:
             pv = Convertor.to_int32([big, little])
             self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 2
         self.i += 1
 
     def _value_float(self):
-        self.add_quantity = 2
         big = self.data_values[self.index_data_value]
         little = self.data_values[self.index_data_value + 1]
         if big == self.fault_value or little == self.fault_value:
@@ -99,33 +94,30 @@ class Convertor:
         else:
             pv = Convertor.to_float32([big, little])
             self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 2
         self.i += 1
 
     def _value_bool(self):
-        self.add_quantity = 1
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
             pv = Convertor.to_bool(self.data_values[self.index_data_value])
             self.present_value.append(pv)
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 1
         self.i += 1
 
     def _value_bit(self):
-        self.add_quantity = 1
         pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
         self.present_value.append(pv)
-        self.index_data_value += self.add_quantity
+        self.index_data_value += 1
         self.i += 1
 
     def _value_mbit(self):
-        self.add_quantity = 1
-        if self.reg_address[self.i] != self.reg_address[self.i + 1] and self.reg_address[self.i] != self.reg_address[
-            self.i - 1]:
+        if self.reg_address[self.i] != self.reg_address[self.i + 1] and self.reg_address[self.i]\
+                != self.reg_address[self.i - 1]:
             pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
             self.present_value.append(pv)
-            self.index_data_value += self.add_quantity
+            self.index_data_value += 1
             self.i += 1
         else:
             address = self.reg_address[self.i]
@@ -133,7 +125,7 @@ class Convertor:
                 pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
                 self.present_value.append(pv)
                 self.i += 1
-            self.index_data_value += self.add_quantity
+            self.index_data_value += 1
 
     @staticmethod
     def to_bool(value):
