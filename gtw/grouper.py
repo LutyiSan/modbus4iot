@@ -2,7 +2,7 @@ from operator import itemgetter
 from env import MULTI_READ
 from csv_validator import Validator
 
-PREFIX = "gtw/devices/"
+PREFIX = "devices/"
 
 
 def csv_to_dict(csv_file, csv_delimiter):
