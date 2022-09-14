@@ -1,7 +1,5 @@
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
-from pymodbus.constants import Endian
-from pymodbus.payload import BinaryPayloadDecoder
 
 
 class Convertor:

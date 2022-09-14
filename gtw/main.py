@@ -1,4 +1,4 @@
-from random import uniform
+import random
 from loguru import logger
 import time
 from modbus_pymodbus import TCPClient
@@ -88,7 +88,7 @@ def runtime():
     gtw = GTW()
     while True:
         gtw.run_gtw()
-        pause = uniform(0.3, 1.1)
+        pause = random.uniform(0.3, 1.1)
         time.sleep(pause)
 
 

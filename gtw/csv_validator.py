@@ -44,7 +44,7 @@ class Validator:
 
     def check_reg_address(self, check_data):
         for ra in check_data:
-            if Validator.validate_digit(ra, 1, 65535):
+            if Validator.validate_digit(ra, 0, 65535):
                 self.state.append(True)
             else:
                 logger.error("column 'reg_address' must be a digit 0-65535")
@@ -134,3 +134,4 @@ class Validator:
             return True
         else:
             return False
+
