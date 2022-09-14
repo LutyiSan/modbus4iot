@@ -1,5 +1,7 @@
-# from loguru import logger
-import struct
+from pymodbus.constants import Endian
+from pymodbus.payload import BinaryPayloadDecoder
+from pymodbus.constants import Endian
+from pymodbus.payload import BinaryPayloadDecoder
 
 
 class Convertor:
@@ -23,9 +25,6 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-            #  logger.debug(
-            #   f"Signals length {len(self.signals['name'])}  Values length {len(self.signals['present_value'])}")
-            #  print(self.signals['value_type'][self.i])
             if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
@@ -42,9 +41,6 @@ class Convertor:
                 self._value_bool()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] != 'None':
                 self._value_bit()
-
-        # logger.debug(f"Signals length {len(self.signals['name'])}  Values length {len(self.signals[
-        # 'present_value'])}") print(self.signals)
         return self.signals
 
     def _value_int16(self):
@@ -120,6 +116,7 @@ class Convertor:
             pv = Convertor.to_bool(self.data_values[self.index_data_value],
                                    self.bit_number[self.i])
             self.present_value.append(pv)
+            self.index_data_value += self.add_quantity
             self.i += 1
         while self.reg_address[self.i] == self.reg_address[self.i + 1] or self.reg_address[self.i] == \
                 self.reg_address[self.i - 1]:
@@ -129,8 +126,8 @@ class Convertor:
                 pv = Convertor.to_bool(self.data_values[self.index_data_value],
                                        self.bit_number[self.i])
                 self.present_value.append(pv)
+            self.index_data_value += self.add_quantity
             self.i += 1
-        self.index_data_value += self.add_quantity
 
     @staticmethod
     def to_bool(values, bit_number):
@@ -166,48 +163,44 @@ class Convertor:
 
     @staticmethod
     def to_int16(value):
-        order = {'big': '>', 'little': '<'}
-        types = {'int16': 'h', 'uint16': 'H', 'int32': 'i', 'uint32': 'I', 'float32': 'f', 'int64': 'l', 'uint64': 'L',
-                 'float64': 'd'}
         if isinstance(value, int):
-            in_value = struct.pack(f"{order['big']}{types['uint16']}", value)
-            out_value = struct.unpack(f"{order['big']}{types['int16']}", in_value)
-            return out_value[0]
+            decoder = BinaryPayloadDecoder.fromRegisters([value],
+                                                         byteorder=Endian.Big,
+                                                         wordorder=Endian.Big)
+            ret_value = decoder.decode_16bit_int()
+            return ret_value
         else:
-            return False
+            return None
 
     @staticmethod
-    def to_uint32(value):
-        order = {'big': '>', 'little': '<'}
-        types = {'int16': 'h', 'uint16': 'H', 'int32': 'i', 'uint32': 'I', 'float32': 'f', 'int64': 'l', 'uint64': 'L',
-                 'float64': 'd'}
-        if isinstance(value, list) and len(value) == 2:
-            in_value = struct.pack(f"{order['big']}2{types['uint16']}", value[0], value[1])
-            out_value = struct.unpack(f"{order['big']}{types['uint32']}", in_value)
-            return out_value[0]
+    def to_uint32(values):
+        if isinstance(values, list) and len(values) == 2:
+            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
+                                                         byteorder=Endian.Big,
+                                                         wordorder=Endian.Big)
+            ret_value = decoder.decode_32bit_uint()
+            return ret_value
         else:
-            return False
+            return None
 
     @staticmethod
-    def to_int32(value):
-        order = {'big': '>', 'little': '<'}
-        types = {'int16': 'h', 'uint16': 'H', 'int32': 'i', 'uint32': 'I', 'float32': 'f', 'int64': 'l', 'uint64': 'L',
-                 'float64': 'd'}
-        if isinstance(value, list) and len(value) == 2:
-            in_value = struct.pack(f"{order['big']}2{types['uint16']}", value[0], value[1])
-            out_value = struct.unpack(f"{order['big']}{types['int32']}", in_value)
-            return out_value[0]
+    def to_int32(values):
+        if isinstance(values, list) and len(values) == 2:
+            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
+                                                         byteorder=Endian.Big,
+                                                         wordorder=Endian.Big)
+            ret_value = decoder.decode_32bit_int()
+            return ret_value
         else:
-            return False
+            return None
 
     @staticmethod
     def to_float32(values):
-        order = {'big': '>', 'little': '<'}
-        types = {'int16': 'h', 'uint16': 'H', 'int32': 'i', 'uint32': 'I', 'float32': 'f', 'int64': 'l', 'uint64': 'L',
-                 'float64': 'd'}
         if isinstance(values, list) and len(values) == 2:
-            in_value = struct.pack(f"{order['big']}2{types['uint16']}", values[1], values[0])
-            out_value = struct.unpack(f"{order['big']}{types['float32']}", in_value)
-            return out_value[0]
+            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
+                                                         byteorder=Endian.Big,
+                                                         wordorder=Endian.Little)
+            ret_value = decoder.decode_32bit_float()
+            return ret_value
         else:
-            return False
+            return None

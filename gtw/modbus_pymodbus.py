@@ -21,12 +21,14 @@ class TCPClient:
             return False
 
     def read_single(self, device):
+        pv = None
         device['present_value'] = []
         pv_list = []
         logger.info("Start reading ......")
         query_count = len(device['name']) - 1
         idx = -1
         while idx < query_count:
+            logger.debug(device['reg_address'][idx])
             idx += 1
             if device['reg_type'][idx] == "hr":
                 pv = TCPClient.read_verifier(self.__read_hr(device['reg_address'][idx], device['quantity'][idx]),
@@ -41,14 +43,21 @@ class TCPClient:
                                              device['quantity'][idx])
                 pv_list.append(pv)
             elif device['reg_type'][idx] == "di":
-                pv = TCPClient.read_verifier(self.__read_di(device['reg_address'][idx], device['quantity'][idx]),
-                                             device['quantity'][idx])
-                pv_list.append(pv)
+                pv = self.__read_di(device['reg_address'][idx], device['quantity'][idx])
+                if isinstance(pv, list):
+                    if False in pv:
+                        pv_list.append([False])
+                    else:
+                        pv_list.append([True])
+                else:
+                    pv_list.append(None)
+            logger.debug(pv)
         self.mblog.info(".....STOP reading")
         data_list = []
         for group in pv_list:
             for value in group:
                 data_list.append(value)
+        logger.debug(data_list)
 
         return device, data_list
 
@@ -58,19 +67,20 @@ class TCPClient:
         count = len(signals['start_address'])
         idx = -1
         while idx < count - 1:
+
             idx += 1
             if signals['reg_type'][idx] == "hr":
                 pv = TCPClient.read_verifier(
                     self.__read_hr(signals['start_address'][idx], signals['read_quantity'][idx]),
                     signals['read_quantity'][idx])
-                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
                 pv_list.append(pv)
             elif signals['reg_type'][idx] == "ir":
                 pv_list.append(
                     TCPClient.read_verifier(
                         self.__read_ir(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
-                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
             elif signals['reg_type'][idx] == "coil":
                 pv_list.append(
                     TCPClient.read_verifier(
@@ -82,7 +92,7 @@ class TCPClient:
                     TCPClient.read_verifier(
                         self.__read_di(signals['start_address'][idx], signals['read_quantity'][idx]),
                         signals['read_quantity'][idx]))
-                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
         logger.info(".....STOP reading")
         for group in pv_list:
             for value in group:
@@ -117,8 +127,10 @@ class TCPClient:
             return False
 
     def __read_di(self, reg_number, quantity):
+
         try:
             result = self.client.read_discrete_inputs(reg_number, quantity, unit=self.UNIT)
+            logger.debug(result.bits[0])
             return result.bits
         except Exception as e:
             self.mblog.exception("Can't Read registers\n", e)
@@ -135,10 +147,10 @@ class TCPClient:
     def read_verifier(values, quantity):
         return_values = []
         if isinstance(values, list) and (len(values) == quantity):
-           # logger.info(values)
+            # logger.info(values)
             return values
         else:
             for i in range(quantity):
-                return_values.append('fault')
-           # logger.info(return_values)
+                return_values.append(None)
+            # logger.info(return_values)
             return return_values

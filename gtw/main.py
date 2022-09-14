@@ -1,5 +1,4 @@
-import random
-
+from random import uniform
 from loguru import logger
 import time
 from modbus_pymodbus import TCPClient
@@ -34,7 +33,8 @@ class GTW:
                             self.result = cv.convert()
                             self.__sent_data()
                         else:
-                            self.gtwlog.error(f"Some trouble with read registers from device {self.device['device_ip'][0]}")
+                            self.gtwlog.error(
+                                f"Some trouble with read registers from device {self.device['device_ip'][0]}")
                 else:
                     self.gtwlog.error(f"{device} with device-data is wrong")
             else:
@@ -58,6 +58,7 @@ class GTW:
                 self.gtwlog.exception("TIMEOUT", e)
             self.client.disconnect()
             #  print(len(self.reading_data[1]))
+
             return self.reading_data
         else:
             try:
@@ -87,7 +88,7 @@ def runtime():
     gtw = GTW()
     while True:
         gtw.run_gtw()
-        pause = random.uniform(0.3, 1.1)
+        pause = uniform(0.3, 1.1)
         time.sleep(pause)
 
 
