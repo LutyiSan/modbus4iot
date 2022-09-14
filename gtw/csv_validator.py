@@ -60,7 +60,7 @@ class Validator:
 
     def check_bit(self, check_data):
         for bit in check_data:
-            if bit == 'None':
+            if bit == None:
                 self.state.append(True)
             else:
                 if Validator.validate_in_enum([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], bit):

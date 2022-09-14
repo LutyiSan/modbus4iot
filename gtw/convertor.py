@@ -4,7 +4,8 @@ from pymodbus.payload import BinaryPayloadDecoder
 
 class Convertor:
 
-    def __init__(self, signals, data_values):
+    def __init__(self, signals, data_values, multi_read):
+        self.multi_read = multi_read
         self.index_data_value = None
         self.i = None
         self.signals = signals
@@ -23,6 +24,7 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
+            print('bit-number', self.bit_number[self.i])
             if self.value_type[self.i] != 'bool':
                 if self.value_type[self.i] == 'int16':
                     self._value_int16()
@@ -34,11 +36,14 @@ class Convertor:
                     self._value_uint32()
                 elif self.value_type[self.i] == 'float':
                     self._value_float()
-            elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] == 'None':
+            elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] is None:
 
                 self._value_bool()
-            elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] != 'None':
-                self._value_bit()
+            elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] is not None:
+                if self.multi_read:
+                    self._value_mbit()
+                else:
+                    self._value_bit()
         return self.signals
 
     def _value_int16(self):
@@ -102,47 +107,55 @@ class Convertor:
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = Convertor.to_bool(self.data_values[self.index_data_value],
-                                   self.bit_number[self.i])
+            pv = Convertor.to_bool(self.data_values[self.index_data_value])
             self.present_value.append(pv)
         self.index_data_value += self.add_quantity
         self.i += 1
 
     def _value_bit(self):
         self.add_quantity = 1
-        if self.reg_address[self.i] != self.reg_address[self.i + 1]:
-            pv = Convertor.to_bool(self.data_values[self.index_data_value],
-                                   self.bit_number[self.i])
+        pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
+        self.present_value.append(pv)
+        self.index_data_value += self.add_quantity
+        self.i += 1
+
+    def _value_mbit(self):
+        self.add_quantity = 1
+        if self.reg_address[self.i] != self.reg_address[self.i + 1] and self.reg_address[self.i] != self.reg_address[
+            self.i - 1]:
+            pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
             self.present_value.append(pv)
             self.index_data_value += self.add_quantity
             self.i += 1
-        while self.reg_address[self.i] == self.reg_address[self.i + 1] or self.reg_address[self.i] == \
-                self.reg_address[self.i - 1]:
-            if self.data_values[self.index_data_value] == self.fault_value:
-                self.present_value.append(self.fault_value)
-            else:
-                pv = Convertor.to_bool(self.data_values[self.index_data_value],
-                                       self.bit_number[self.i])
+        else:
+            address = self.reg_address[self.i]
+            while address == self.reg_address[self.i]:
+                pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
                 self.present_value.append(pv)
+                self.i += 1
             self.index_data_value += self.add_quantity
-            self.i += 1
 
     @staticmethod
-    def to_bool(values, bit_number):
-        if values == 'fault':
-            return 'fault'
+    def to_bool(value):
+        if value is None:
+            return None
         else:
-            if bit_number == 'None':
-                if values:
-                    return True
-                else:
-                    return False
+            if value:
+                return True
             else:
-                bv = Convertor.to_16bit_array(values)
-                if int(bv[bit_number]) == 1:
-                    return True
-                else:
-                    return False
+                return False
+
+    @staticmethod
+    def to_bit(value, bit):
+        #  print(bit)
+        if value is None:
+            return None
+        else:
+            bv = Convertor.to_16bit_array(value)
+            if int(bv[bit]) == 1:
+                return True
+            else:
+                return False
 
     @staticmethod
     def to_16bit_array(value):

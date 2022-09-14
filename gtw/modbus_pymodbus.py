@@ -21,6 +21,7 @@ class TCPClient:
             return False
 
     def read_single(self, device):
+        multi_read = False
         pv = None
         device['present_value'] = []
         pv_list = []
@@ -59,9 +60,10 @@ class TCPClient:
                 data_list.append(value)
         logger.debug(data_list)
 
-        return device, data_list
+        return device, data_list, multi_read
 
     def read_multiple(self, signals):
+        multi_read = True
         pv_list = []
         data_list = []
         count = len(signals['start_address'])
@@ -73,32 +75,35 @@ class TCPClient:
                 pv = TCPClient.read_verifier(
                     self.__read_hr(signals['start_address'][idx], signals['read_quantity'][idx]),
                     signals['read_quantity'][idx])
-                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
                 pv_list.append(pv)
             elif signals['reg_type'][idx] == "ir":
-                pv_list.append(
-                    TCPClient.read_verifier(
+
+                pv = TCPClient.read_verifier(
                         self.__read_ir(signals['start_address'][idx], signals['read_quantity'][idx]),
-                        signals['read_quantity'][idx]))
-                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
-            elif signals['reg_type'][idx] == "coil":
-                pv_list.append(
-                    TCPClient.read_verifier(
-                        self.__read_coils(signals['start_address'][idx], signals['read_quantity'][idx]),
-                        signals['read_quantity'][idx]))
+                        signals['read_quantity'][idx])
                 self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                pv_list.append(pv)
+            elif signals['reg_type'][idx] == "coil":
+
+                pv = TCPClient.read_verifier(
+                        self.__read_coils(signals['start_address'][idx], signals['read_quantity'][idx]),
+                        signals['read_quantity'][idx])
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                pv_list.append(pv)
             elif signals['reg_type'][idx] == "di":
-                pv_list.append(
-                    TCPClient.read_verifier(
+
+                pv = TCPClient.read_verifier(
                         self.__read_di(signals['start_address'][idx], signals['read_quantity'][idx]),
-                        signals['read_quantity'][idx]))
-                self.mblog.debug(f"From start register {signals['start_address'][idx]}")
+                        signals['read_quantity'][idx])
+                self.mblog.debug(f"From start register {signals['start_address'][idx]} read {pv}")
+                pv_list.append(pv)
         logger.info(".....STOP reading")
         for group in pv_list:
             for value in group:
                 data_list.append(value)
 
-        return signals, data_list
+        return signals, data_list, multi_read
 
     def __read_hr(self, reg_number, quantity):
 
@@ -154,4 +159,3 @@ class TCPClient:
                 return_values.append(None)
             # logger.info(return_values)
             return return_values
-

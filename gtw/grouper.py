@@ -22,7 +22,7 @@ def csv_to_dict(csv_file, csv_delimiter):
         for col in cols:
             c += 1
             if row[c] == '':
-                row[c] = 'None'
+                row[c] = None
             elif row[c].isdigit():
                 row[c] = int(row[c])
             result_dict[col].append(row[c])
@@ -68,7 +68,7 @@ class Grouper:
         self.return_dict = {'start_address': [], 'read_quantity': [], 'reg_type': [], 'reg_address': [],
                             'quantity': [], 'value_type': [], 'bit_number': [], 'name': [], 'present_value': [],
                             'scale': []}
-        self.signals = csv_to_dict(device, ';')
+        self.signals = device
         if self.signals:
             self.signals = get_sorted_signal_dict(get_signal_list(self.signals))
             self.signals['start_address'] = []
@@ -82,23 +82,19 @@ class Grouper:
             else:
                 max_query = MULTI_READ
             self.len_signals = len(self.signals['reg_address'])
-            #  print(self.signals['reg_address'])
-            #  print(self.signals['quantity'])
             self.start_address = self.signals['reg_address'][0]
             self.read_quantity = self.signals['quantity'][0]
             i = -1
             while i < self.len_signals - 2:
-
                 if self.read_quantity == max_query:
                     self.__append_group(self.start_address, self.read_quantity)
                     self.start_address = self.signals['reg_address'][i + 1]
                     self.read_quantity = 0
                 i += 1
-
                 if self.signals['reg_type'][i] == self.signals['reg_type'][i + 1]:
                     self.__type_grouper(i)
                 else:
-                    self.__append_group(self.start_address, self.read_quantity)
+                   # self.__append_group(self.start_address, self.read_quantity)
                     self.__type_grouper(i)
             self.__append_group(self.start_address, self.read_quantity)
             print(self.signals)

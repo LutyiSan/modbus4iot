@@ -8,6 +8,18 @@ from env import *
 from grouper import Grouper, csv_to_dict
 
 
+def do_devices():
+    devices_list = []
+    if DEVICE_LIST and (len(DEVICE_LIST) > 0):
+        for i in DEVICE_LIST:
+            d = csv_to_dict(i, ';')
+            devices_list.append(d)
+    if devices_list:
+        return devices_list
+    else:
+        return False
+
+
 class GTW:
     gtwlog = logger
 
@@ -18,32 +30,29 @@ class GTW:
         self.mqtt_create_state = self.mqttclient.create(USER_NAME, USE_PASSWD)
         self.reading_data = None
 
-    def run_gtw(self):
+    def run_gtw(self, devices_list):
         self.gtwlog.info("GTW is running on")
-        for device in DEVICE_LIST:
-            self.device = csv_to_dict(device, ';')  # Получаем словарь из csv девайса
+        for self.device in devices_list:
             if self.device:
                 self.gtwlog.info("Grouping objects...")
-                if self.__group_objects(device):
-                    if self.__modbus_connect(self.device['device_ip'][0], self.device['port'][0]):
-                        if self.__modbus_read(self.device['device_ip'][0], self.signals, self.device):
-                            self.gtwlog.info("Convert reading objects...")
-                            #     print(self.reading_data[0], self.reading_data[1])
-                            cv = Convertor(self.reading_data[0], self.reading_data[1])
-                            self.result = cv.convert()
-                            self.__sent_data()
-                        else:
-                            self.gtwlog.error(
-                                f"Some trouble with read registers from device {self.device['device_ip'][0]}")
-                else:
-                    self.gtwlog.error(f"{device} with device-data is wrong")
-            else:
-                self.gtwlog.error(f"{device} with device-data is wrong")
+                self.__group_objects(self.device)
+                if self.__modbus_connect(self.device['device_ip'][0], self.device['port'][0]):
+                    if self.__modbus_read(self.device['device_ip'][0], self.signals, self.device):
+                        self.gtwlog.info("Convert reading objects...")
+                        cv = Convertor(self.reading_data[0], self.reading_data[1],self.reading_data[2])
+                        self.result = cv.convert()
+                        self.__sent_data()
+                    else:
+                        self.gtwlog.error(f"Some trouble with read registers from device {self.device['device_ip'][0]}")
 
     def __group_objects(self, device):
-        self.grouper = Grouper(device)
-        self.signals = self.grouper.grouping()
-        return self.signals
+        if MULTI_READ > 1:
+            self.grouper = Grouper(device)
+            self.signals = self.grouper.grouping()
+            return self.signals
+        else:
+            self.signals = False
+            return self.signals
 
     def __modbus_connect(self, ip, port):
         self.client = TCPClient()
@@ -85,11 +94,15 @@ class GTW:
 
 
 def runtime():
-    gtw = GTW()
-    while True:
-        gtw.run_gtw()
-        pause = random.uniform(0.3, 1.1)
-        time.sleep(pause)
+    devices_list = do_devices()
+    if devices_list:
+        gtw = GTW()
+        while True:
+            gtw.run_gtw(devices_list)
+            pause = random.uniform(0.3, 1.1)
+            time.sleep(pause)
+    else:
+        logger.error('Wrong DEVICE_LIST! See gtw/env.py...')
 
 
 if __name__ == "__main__":
