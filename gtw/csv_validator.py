@@ -1,5 +1,11 @@
 from loguru import logger
 
+reg_types = ['co', 'di', 'hr', 'ir']
+
+data_types = ['uint16', 'int16', 'float16',
+              'uint32', 'int32', 'float32',
+              'uint64', 'int64', 'float64', 'bool', 'bit']
+
 
 class Validator:
     state = []
@@ -31,15 +37,15 @@ class Validator:
         if Validator.validate_digit(check_data, 1, 65535):
             self.state.append(True)
         else:
-            logger.error("column 'port' must be a digit 0-65535")
+            logger.error("column 'port' must be a digit 1-65535")
             self.state.append(False)
 
     def check_reg_type(self, check_data):
         for rt in check_data:
-            if Validator.validate_in_enum(['hr', 'ir', 'co', 'di'], rt):
+            if Validator.validate_in_enum(reg_types, rt):
                 self.state.append(True)
             else:
-                logger.error("column 'reg_type' must be a 'hr', 'ir', 'co', 'di'")
+                logger.error(f"Column 'reg_type' must be a {reg_types}")
                 self.state.append(False)
 
     def check_reg_address(self, check_data):
@@ -55,7 +61,7 @@ class Validator:
             if Validator.validate_digit(qu, 1, 4):
                 self.state.append(True)
             else:
-                logger.error("column 'quantity' must be a digit 0-4")
+                logger.error("column 'quantity' must be a digit 1-4")
                 self.state.append(False)
 
     def check_bit(self, check_data):
@@ -71,10 +77,10 @@ class Validator:
 
     def check_value_type(self, check_data):
         for vt in check_data:
-            if Validator.validate_in_enum(['uint16', 'int16', 'uint32', 'int32', 'float', 'bool'], vt):
+            if Validator.validate_in_enum(data_types, vt):
                 self.state.append(True)
             else:
-                logger.error("column 'value type' must be a 'uint16', 'int16', 'uint32', 'int32','float', 'bool'")
+                logger.error(f"column 'value type' must be a {data_types}")
                 self.state.append(False)
 
     def check_scale(self, check_data):

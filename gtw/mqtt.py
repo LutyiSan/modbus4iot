@@ -15,7 +15,6 @@ class MyMQTT:
             return True
         except Exception as e:
             self.mqlog.exception("FAIL create mqtt-client", e)
-            return False
 
     def connect(self, broker, port):
         try:

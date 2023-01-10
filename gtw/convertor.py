@@ -24,20 +24,14 @@ class Convertor:
         self.i = 0
         self.index_data_value = 0
         while self.i < count:
-
             if self.value_type[self.i] != 'bool':
-                if self.value_type[self.i] == 'int16':
-                    self._value_int16()
-                elif self.value_type[self.i] == 'int32':
-                    self._value_int32()
-                elif self.value_type[self.i] == 'uint16':
-                    self._value_uint16()
-                elif self.value_type[self.i] == 'uint32':
-                    self._value_uint32()
-                elif self.value_type[self.i] == 'float':
+                if 'int' in self.value_type[self.i]:
+                    self._value_int()
+                elif 'uint' in self.value_type[self.i]:
+                    self._value_uint()
+                elif 'float' in self.value_type[self.i]:
                     self._value_float()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] is None:
-
                 self._value_bool()
             elif self.value_type[self.i] == 'bool' and self.bit_number[self.i] is not None:
                 if self.multi_read:
@@ -46,58 +40,202 @@ class Convertor:
                     self._value_bit()
         return self.signals
 
-    def _value_int16(self):
+    def _value_int(self):
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = Convertor.to_int16(self.data_values[self.index_data_value])
-            self.present_value.append(pv * float(self.scale[self.i]))
-        self.i += 1
-        self.index_data_value += 1
+            if '16' in self.value_type[self.i]:
+                pv = Convertor.to_int16(self.data_values[self.index_data_value])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 1
+            elif '32' in self.value_type[self.i]:
+                pv = Convertor.to_int32(self.data_values[self.index_data_value:self.index_data_value + 2])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 2
+            elif '64' in self.value_type[self.i]:
+                pv = Convertor.to_int64(self.data_values[self.index_data_value:self.index_data_value + 4])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 4
 
-    def _value_int32(self):
-        big = self.data_values[self.index_data_value]
-        little = self.data_values[self.index_data_value + 1]
-        if big == self.fault_value or little == self.fault_value:
-            self.present_value.append(self.fault_value)
-        else:
-            pv = Convertor.to_int32([big, little])
-            self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += 2
-        self.i += 1
-
-    def _value_uint16(self):
+    def _value_uint(self):
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = self.data_values[self.index_data_value]
-            self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += 1
-        self.i += 1
-
-    def _value_uint32(self):
-        big = self.data_values[self.index_data_value]
-        little = self.data_values[self.index_data_value + 1]
-        if big == self.fault_value or little == self.fault_value:
-            self.present_value.append(self.fault_value)
-        else:
-            pv = Convertor.to_int32([big, little])
-            self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += 2
-        self.i += 1
+            if '16' in self.value_type[self.i]:
+                pv = Convertor.to_uint16(self.data_values[self.index_data_value])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 1
+            elif '32' in self.value_type[self.i]:
+                pv = Convertor.to_uint32(self.data_values[self.index_data_value:self.index_data_value + 2])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 2
+            elif '64' in self.value_type[self.i]:
+                pv = Convertor.to_uint64(self.data_values[self.index_data_value:self.index_data_value + 4])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 4
 
     def _value_float(self):
-        big = self.data_values[self.index_data_value]
-        little = self.data_values[self.index_data_value + 1]
-        if big == self.fault_value or little == self.fault_value:
+        if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
-            pv = Convertor.to_float32([big, little])
-            self.present_value.append(pv * float(self.scale[self.i]))
-        self.index_data_value += 2
-        self.i += 1
+            if '16' in self.value_type[self.i]:
+                pv = Convertor.to_float16(self.data_values[self.index_data_value])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 1
+            elif '32' in self.value_type[self.i]:
+                pv = Convertor.to_float32(self.data_values[self.index_data_value:self.index_data_value + 2])
+
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 2
+            elif '64' in self.value_type[self.i]:
+                pv = Convertor.to_float64(self.data_values[self.index_data_value:self.index_data_value + 4])
+                self.present_value.append(pv * float(self.scale[self.i]))
+                self.i += 1
+                self.index_data_value += 4
+
+    @staticmethod
+    def to_uint16(value: int, inverse=False) -> int or None:
+        if inverse:
+            bo = Endian.Little
+        else:
+            bo = Endian.Big
+        if isinstance(value, int):
+            decoder = BinaryPayloadDecoder.fromRegisters([value], byteorder=bo, wordorder=Endian.Big)
+            return decoder.decode_16bit_uint()
+        else:
+            return None
+
+    @staticmethod
+    def to_int16(value: int, inverse=False) -> int or None:
+        if inverse:
+            bo = Endian.Little
+        else:
+            bo = Endian.Big
+        if isinstance(value, int):
+            decoder = BinaryPayloadDecoder.fromRegisters([value], byteorder=bo, wordorder=Endian.Big)
+            return decoder.decode_16bit_int()
+        else:
+            return None
+
+    @staticmethod
+    def to_int32(values: list[int], inverse=False) -> int or None:
+        if inverse:
+            wo = Endian.Little
+        else:
+            wo = Endian.Big
+        if isinstance(values, list) and len(values) == 2:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+                else:
+                    decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                    return decoder.decode_32bit_int()
+        else:
+            return None
+
+    @staticmethod
+    def to_int64(values: list[int], inverse=False) -> int or None:
+        if inverse:
+            wo = Endian.Little
+        else:
+            wo = Endian.Big
+        if isinstance(values, list) and len(values) == 4:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+                else:
+                    decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                    return decoder.decode_64bit_int()
+        else:
+            return None
+
+    @staticmethod
+    def to_uint32(values: list[int], inverse=False) -> int or None:
+        if inverse:
+            wo = Endian.Little
+        else:
+            wo = Endian.Big
+
+        if isinstance(values, list) and len(values) == 2:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+            else:
+                decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                return decoder.decode_32bit_uint()
+        else:
+            return None
+
+    @staticmethod
+    def to_uint64(values: list[int], inverse=False) -> int or None:
+        if inverse:
+            wo = Endian.Little
+        else:
+            wo = Endian.Big
+        if isinstance(values, list) and len(values) == 4:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+                else:
+                    decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                    return decoder.decode_64bit_uint()
+        else:
+            return None
+
+    @staticmethod
+    def to_float16(values: int, inverse=False) -> float or None:
+        if inverse:
+            bo = Endian.Little
+        else:
+            bo = Endian.Big
+        if isinstance(values, int):
+            decoder = BinaryPayloadDecoder.fromRegisters([values], byteorder=bo, wordorder=Endian.Little)
+            return decoder.decode_16bit_float()
+        else:
+            return None
+
+    @staticmethod
+    def to_float32(values: list[int], inverse=False) -> float or None:
+        if not inverse:
+            wo = Endian.Big
+        else:
+            wo = Endian.Little
+        if isinstance(values, list) and len(values) == 2:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+                else:
+                    decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                    return decoder.decode_32bit_float()
+        else:
+            return None
+
+    @staticmethod
+    def to_float64(values: list[int], inverse=False) -> float or None:
+        if inverse:
+            wo = Endian.Big
+        else:
+            wo = Endian.Little
+        if isinstance(values, list) and len(values) == 4:
+            for i in values:
+                if not isinstance(i, int):
+                    return None
+                else:
+                    decoder = BinaryPayloadDecoder.fromRegisters(values, byteorder=Endian.Big, wordorder=wo)
+                    return decoder.decode_64bit_float()
+        else:
+            return None
 
     def _value_bool(self):
+
         if isinstance(self.data_values[self.index_data_value], str):
             self.present_value.append(self.fault_value)
         else:
@@ -113,7 +251,7 @@ class Convertor:
         self.i += 1
 
     def _value_mbit(self):
-        if self.reg_address[self.i] != self.reg_address[self.i + 1] and self.reg_address[self.i]\
+        if self.reg_address[self.i] != self.reg_address[self.i + 1] and self.reg_address[self.i] \
                 != self.reg_address[self.i - 1]:
             pv = Convertor.to_bit(self.data_values[self.index_data_value], self.bit_number[self.i])
             self.present_value.append(pv)
@@ -163,47 +301,3 @@ class Convertor:
             return zero_array
         else:
             return bin_value
-
-    @staticmethod
-    def to_int16(value):
-        if isinstance(value, int):
-            decoder = BinaryPayloadDecoder.fromRegisters([value],
-                                                         byteorder=Endian.Big,
-                                                         wordorder=Endian.Big)
-            ret_value = decoder.decode_16bit_int()
-            return ret_value
-        else:
-            return None
-
-    @staticmethod
-    def to_uint32(values):
-        if isinstance(values, list) and len(values) == 2:
-            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
-                                                         byteorder=Endian.Big,
-                                                         wordorder=Endian.Big)
-            ret_value = decoder.decode_32bit_uint()
-            return ret_value
-        else:
-            return None
-
-    @staticmethod
-    def to_int32(values):
-        if isinstance(values, list) and len(values) == 2:
-            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
-                                                         byteorder=Endian.Big,
-                                                         wordorder=Endian.Big)
-            ret_value = decoder.decode_32bit_int()
-            return ret_value
-        else:
-            return None
-
-    @staticmethod
-    def to_float32(values):
-        if isinstance(values, list) and len(values) == 2:
-            decoder = BinaryPayloadDecoder.fromRegisters([values[0], values[1]],
-                                                         byteorder=Endian.Big,
-                                                         wordorder=Endian.Little)
-            ret_value = decoder.decode_32bit_float()
-            return ret_value
-        else:
-            return None
