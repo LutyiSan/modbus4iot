@@ -7,6 +7,6 @@ MULTI_READ = 124  # Так же задает максимальную длину
 # MQTT параметры
 USER_NAME = 'user'
 USE_PASSWD = 'user'
-BROKER = "mq.4iot.pro"
+BROKER = "mq.brocker.com"
 BROKER_PORT = 15675
-TOPIC = "lucenko-mb-gtw"
+TOPIC = "mb4iot"
